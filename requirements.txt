@@ -1,6 +1,6 @@
-qiskit
-pandas
 numpy
-matplotlib
+pandas
 yfinance
-scipy
+qiskit
+qiskit-aer
+qiskit-optimization
