@@ -47,40 +47,37 @@ This project aims to:
 ```bash
 git clone https://github.com/Towaiji/quantum-portfolio-optimizer.git
 cd quantum-portfolio-optimizer
+```
 
 2. Create and Activate Virtual Environment
 For macOS/Linux:
 
-bash
-Copy
-Edit
+```bash
 python3 -m venv venv
 source venv/bin/activate
+```
 For Windows:
 
-bash
-Copy
-Edit
+```bash
 python -m venv venv
 .\venv\Scripts\activate
+```
+
 3. Install Dependencies
-bash
-Copy
-Edit
+```bash
 pip install -r requirements.txt
 Ensure you have the latest versions:
-
-bash
-Copy
-Edit
+```
+```bash
 pip install --upgrade qiskit qiskit-optimization
+```
 Usage
 Running the Full Pipeline
-bash
-Copy
-Edit
+
+```bash
 python src/main.py
 This script will:
+```
 
 Download and clean stock data
 
@@ -93,12 +90,10 @@ Solve it using both classical and quantum methods
 Print results
 
 Running Interactive Analysis
-bash
-Copy
-Edit
+```bash
 jupyter notebook notebooks/analysis.ipynb
 Use the notebook to explore:
-
+```
 Stock data
 
 Daily returns
@@ -113,9 +108,10 @@ Contributing
 Contributions are welcome! Please open issues or pull requests.
 
 License
-[MIT License] (or whichever you choose)
+[MIT License]
 
 Acknowledgements
+
 Yahoo Finance for providing financial data.
 
 Qiskit for providing the quantum computing framework.
