@@ -1,48 +1,124 @@
-Quantum Portfolio Optimizer
-Overview
-Quantum Portfolio Optimizer is a quantum computing project that integrates real financial data with quantum optimization techniques to select an optimal portfolio of assets. The project downloads historical stock prices, computes expected annual returns and risk (covariance), formulates the portfolio optimization problem as a Quadratic Unconstrained Binary Optimization (QUBO) problem, and then solves it using both classical and quantum solvers (QAOA via Qiskit).
+# Quantum Portfolio Optimizer
+
+## Overview
+
+**Quantum Portfolio Optimizer** is a quantum computing project that integrates real financial data with quantum optimization techniques to select an optimal portfolio of assets.  
+The project downloads historical stock prices, computes expected annual returns and risk (covariance), formulates the portfolio optimization problem as a Quadratic Unconstrained Binary Optimization (QUBO) problem, and solves it using both classical and quantum solvers (QAOA via Qiskit).
 
 This project serves as an impressive portfolio piece demonstrating the application of quantum computing to real-world finance challenges.
 
-Motivation
-Modern portfolio optimization is an NP-hard problem, where selecting the best mix of assets to maximize returns while minimizing risk is computationally challenging. Quantum computing, particularly algorithms like QAOA, offers new ways to tackle these problems efficiently. This project aims to:
+---
 
-Showcase the integration of real financial data with quantum computing methods.
+## Motivation
 
-Compare classical brute-force solutions with quantum optimization.
+Modern portfolio optimization is an NP-hard problem, where selecting the best mix of assets to maximize returns while minimizing risk is computationally challenging.  
+Quantum computing, particularly algorithms like QAOA, offers new ways to tackle these problems efficiently.
 
-Provide interactive analysis and visualizations to understand risk-return trade-offs.
+This project aims to:
+- Showcase the integration of real financial data with quantum computing methods.
+- Compare classical brute-force solutions with quantum optimization.
+- Provide interactive analysis and visualizations to understand risk-return trade-offs.
 
-Features
-Real Data Integration:
-Downloads historical stock data using Yahoo Finance via the data_collection.py module .
+---
 
-Data Processing:
-Cleans data and calculates daily returns, annualized mean returns, and the covariance matrix.
+## Features
 
-QUBO Formulation:
-Converts the portfolio optimization problem into a QUBO model using financial metrics (μ and Σ) via problem_formulation.py .
+- **Real Data Integration:**  
+  Downloads historical stock data using Yahoo Finance (`data_collection.py`).
 
-Classical and Quantum Solvers:
-Benchmarks portfolio selection using both a classical brute-force solver (classical_solver.py ) and a quantum solver using QAOA (quantum_solver.py ).
+- **Data Processing:**  
+  Cleans data and calculates daily returns, annualized mean returns, and the covariance matrix.
 
-Interactive Analysis:
-Provides Jupyter notebooks (notebooks/analysis.ipynb) for data visualization and comparative analysis of results.
+- **QUBO Formulation:**  
+  Converts the portfolio optimization problem into a QUBO model (`problem_formulation.py`).
 
-Repository Structure
-graphql
+- **Classical and Quantum Solvers:**  
+  Benchmarks solutions using a classical brute-force solver (`classical_solver.py`) and a quantum solver with QAOA (`quantum_solver.py`).
+
+- **Interactive Analysis:**  
+  Provides a Jupyter Notebook (`notebooks/analysis.ipynb`) for visualizations and comparative analysis.
+
+---
+
+## Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Towaiji/quantum-portfolio-optimizer.git
+cd quantum-portfolio-optimizer
+
+2. Create and Activate Virtual Environment
+For macOS/Linux:
+
+bash
 Copy
-quantum-portfolio-optimizer/
-├── data/                     # Contains downloaded CSV data files
-│   └── stock_data.csv        # Cleaned stock data (generated at runtime)
-├── notebooks/                # Jupyter notebooks for interactive analysis
-│   └── analysis.ipynb        # Notebook for visualizations and comparisons
-├── src/                      # Source code for the project
-│   ├── classical_solver.py   # Classical brute-force QUBO solver
-│   ├── data_collection.py    # Module to download and process stock data
-│   ├── problem_formulation.py# Constructs the QUBO matrix from financial data
-│   ├── quantum_solver.py     # Quantum optimization using QAOA (Qiskit)
-│   └── main.py               # Main script that integrates the full pipeline
-├── tests/                    # (Optional) Unit tests for modules
-├── README.md                 # This file
-└── requirements.txt          # List of Python dependencies
+Edit
+python3 -m venv venv
+source venv/bin/activate
+For Windows:
+
+bash
+Copy
+Edit
+python -m venv venv
+.\venv\Scripts\activate
+3. Install Dependencies
+bash
+Copy
+Edit
+pip install -r requirements.txt
+Ensure you have the latest versions:
+
+bash
+Copy
+Edit
+pip install --upgrade qiskit qiskit-optimization
+Usage
+Running the Full Pipeline
+bash
+Copy
+Edit
+python src/main.py
+This script will:
+
+Download and clean stock data
+
+Calculate annual returns and risks
+
+Build the QUBO model
+
+Solve it using both classical and quantum methods
+
+Print results
+
+Running Interactive Analysis
+bash
+Copy
+Edit
+jupyter notebook notebooks/analysis.ipynb
+Use the notebook to explore:
+
+Stock data
+
+Daily returns
+
+Risk-return profiles
+
+QUBO matrix
+
+Comparison of classical vs quantum solutions
+
+Contributing
+Contributions are welcome! Please open issues or pull requests.
+
+License
+[MIT License] (or whichever you choose)
+
+Acknowledgements
+Yahoo Finance for providing financial data.
+
+Qiskit for providing the quantum computing framework.
+
+Inspirations from research in quantum portfolio optimization.
+
