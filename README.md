@@ -94,7 +94,7 @@ Running Interactive Analysis
 jupyter notebook notebooks/analysis.ipynb
 ```
 
-**Use the notebook to explore:
+**Use the notebook to explore:**
 
 Stock data
 
@@ -106,13 +106,13 @@ QUBO matrix
 
 Comparison of classical vs quantum solutions
 
-**Contributing
+**Contributing**
 Contributions are welcome! Please open issues or pull requests.
 
-**License
+**License**
 [MIT License]
 
-**Acknowledgements
+**Acknowledgements**
 
 Yahoo Finance for providing financial data.
 
