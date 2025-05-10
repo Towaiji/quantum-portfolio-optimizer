@@ -1,5 +1,7 @@
 # Quantum Portfolio Optimizer
 
+**Note**: Quantum solver module is paused due to environment conflicts with Python 3.12 and will be resumed with a stable build.
+
 ## Overview
 
 **Quantum Portfolio Optimizer** is a quantum computing project that integrates real financial data with quantum optimization techniques to select an optimal portfolio of assets.  
