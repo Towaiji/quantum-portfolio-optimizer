@@ -1,5 +1,5 @@
 import numpy as np
-from qiskit import Aer
+from qiskit_aer import Aer
 from qiskit_algorithms import QAOA
 from qiskit_optimization.algorithms import MinimumEigenOptimizer
 from qiskit_optimization.problems import QuadraticProgram
