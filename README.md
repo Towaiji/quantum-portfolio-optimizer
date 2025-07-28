@@ -124,3 +124,21 @@ Qiskit for providing the quantum computing framework.
 
 Inspirations from research in quantum portfolio optimization.
 
+
+
+--------
+summary for personal use
+
+Data retrieval and processing – data_collection.py downloads historical stock prices via Yahoo Finance, cleans the dataset, and computes annualized mean returns and covariances. Key functions include download_stock_data, clean_and_save_data, and calculate_returns_and_risk.
+
+Problem formulation – problem_formulation.py converts those statistics into a QUBO matrix where the objective is to maximize returns and penalize risk while enforcing a fixed number of assets. This logic is implemented in construct_qubo.
+
+Classical solution – classical_solver.py provides a brute-force solver that enumerates all binary combinations to minimize the QUBO objective.
+
+Quantum solution – quantum_solver.py defines a QAOA-based approach using Qiskit. It builds a quadratic program from the QUBO matrix and solves it with MinimumEigenOptimizer and QAOA. The README mentions that this quantum solver is paused due to a Python 3.12 environment conflict.
+
+Execution pipeline – main.py ties everything together: it fetches data, computes metrics, constructs the QUBO model, and runs both classical and quantum solvers, printing the results to the console.
+
+The project includes a small dataset (data/stock_data.csv) for demonstration. Running the pipeline requires the packages listed in requirements.txt. On this system, running python src/main.py failed because dependencies (e.g., NumPy) are not installed. Attempting to install them via pip install -r requirements.txt was blocked by the environment’s network restrictions
+
+--------
