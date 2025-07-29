@@ -1,144 +1,94 @@
 # Quantum Portfolio Optimizer
 
-**Note**: Quantum solver module is paused due to environment conflicts with Python 3.12 and will be resumed with a stable build.
-
-## Overview
-
-**Quantum Portfolio Optimizer** is a quantum computing project that integrates real financial data with quantum optimization techniques to select an optimal portfolio of assets.  
-The project downloads historical stock prices, computes expected annual returns and risk (covariance), formulates the portfolio optimization problem as a Quadratic Unconstrained Binary Optimization (QUBO) problem, and solves it using both classical and quantum solvers (QAOA via Qiskit).
-
-This project serves as an impressive portfolio piece demonstrating the application of quantum computing to real-world finance challenges.
+[![Streamlit App](https://img.shields.io/badge/Live-App-blue)](https://quantumportfoliooptimizer.streamlit.app/)
 
 ---
 
-## Motivation
+## Overview
 
-Modern portfolio optimization is an NP-hard problem, where selecting the best mix of assets to maximize returns while minimizing risk is computationally challenging.  
-Quantum computing, particularly algorithms like QAOA, offers new ways to tackle these problems efficiently.
+**Quantum Portfolio Optimizer** is a portfolio optimization project combining real financial data with advanced optimization techniques, including a classical brute-force solver and a quantum solver prototype using QAOA (Qiskit).  
+The project fetches historical stock prices, computes returns and risk, formulates a QUBO model, and finds an optimal stock mix balancing return and risk.
 
-This project aims to:
-- Showcase the integration of real financial data with quantum computing methods.
-- Compare classical brute-force solutions with quantum optimization.
-- Provide interactive analysis and visualizations to understand risk-return trade-offs.
+> **Note:** The quantum solver is currently **paused** due to compatibility issues with Python 3.12+. Only the classical solver works on the deployed website.
 
 ---
 
 ## Features
 
-- **Real Data Integration:**  
-  Downloads historical stock data using Yahoo Finance (`data_collection.py`).
-
-- **Data Processing:**  
-  Cleans data and calculates daily returns, annualized mean returns, and the covariance matrix.
-
-- **QUBO Formulation:**  
-  Converts the portfolio optimization problem into a QUBO model (`problem_formulation.py`).
-
-- **Classical and Quantum Solvers:**  
-  Benchmarks solutions using a classical brute-force solver (`classical_solver.py`) and a quantum solver with QAOA (`quantum_solver.py`).
-
-- **Interactive Analysis:**  
-  Provides a Jupyter Notebook (`notebooks/analysis.ipynb`) for visualizations and comparative analysis.
+- Real historical stock data retrieval using Yahoo Finance
+- Data cleaning and calculation of annualized returns and covariance
+- QUBO problem formulation for portfolio optimization with constraints
+- Classical brute-force solver for exact optimization
+- Quantum solver prototype with QAOA (requires Python 3.10 environment)
+- Interactive Streamlit web app for easy portfolio analysis and visualization
 
 ---
 
-## Installation
+## Live Demo
 
-### 1. Clone the Repository
+Try it out on [Streamlit Cloud](https://quantumportfoliooptimizer.streamlit.app/) — classical solver only.
 
+---
+
+## Installation & Setup (for Development)
+
+1. Clone the repo:
+
+   ```bash
+   git clone https://github.com/Towaiji/quantum-portfolio-optimizer.git
+   cd quantum-portfolio-optimizer
+   ```
+2. Create and activate a Python 3.10 virtual environment (required for quantum solver):
+
+macOS/Linux:
 ```bash
-git clone https://github.com/Towaiji/quantum-portfolio-optimizer.git
-cd quantum-portfolio-optimizer
+python3.10 -m venv .venv
+source .venv/bin/activate
 ```
-
-2. Create and Activate Virtual Environment
-For macOS/Linux:
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
+Windows:
+```powershell
+python3.10 -m venv .venv
+.\.venv\Scripts\activate
 ```
-For Windows:
-
+Install dependencies:
 ```bash
-python -m venv venv
-.\venv\Scripts\activate
-```
-
-3. Install Dependencies
-```bash
+Copy
 pip install -r requirements.txt
-Ensure you have the latest versions:
 ```
-```bash
-pip install --upgrade qiskit qiskit-optimization
-```
-Usage
-Running the Full Pipeline
 
+## Running
+Classical Solver (Works in any Python 3.10+ environment)
 ```bash
 python src/main.py
-This script will:
 ```
+Quantum Solver (Requires Python 3.10 environment due to Qiskit compatibility)
 
-Download and clean stock data
+-Activate your Python 3.10 virtual environment (see above).
 
-Calculate annual returns and risks
+-Run the same main.py script; quantum solver is toggled inside the code.
 
-Build the QUBO model
+-Note: Quantum solver module is currently paused by default due to dependency conflicts.
 
-Solve it using both classical and quantum methods
+## Usage
+Input stock tickers, date ranges, and optimization parameters in the Streamlit app.
 
-Print results
+See recommended portfolio selections with risk/return visualizations.
 
-Running Interactive Analysis
-```bash
-jupyter notebook notebooks/analysis.ipynb
-```
+Download results as CSV.
 
-## Use the notebook to explore:
+## Troubleshooting & Notes
+The quantum solver depends on specific Qiskit versions compatible only with Python 3.10.x.
 
-Stock data
+Streamlit Cloud currently uses Python 3.13, which conflicts with Qiskit dependencies; that’s why only the classical solver is deployed live.
 
-Daily returns
-
-Risk-return profiles
-
-QUBO matrix
-
-Comparison of classical vs quantum solutions
-
-**Contributing**
-
-Contributions are welcome! Please open issues or pull requests.
+Use runtime.txt with Python 3.10.x if deploying quantum solver in an environment supporting older Python versions.
 
 ## License
-
-[MIT License]
+MIT License
 
 ## Acknowledgements
+Yahoo Finance for stock data
 
-Yahoo Finance for providing financial data.
+Qiskit for quantum computing framework
 
-Qiskit for providing the quantum computing framework.
-
-Inspirations from research in quantum portfolio optimization.
-
-
-
---------
-summary for personal use
-
-Data retrieval and processing – data_collection.py downloads historical stock prices via Yahoo Finance, cleans the dataset, and computes annualized mean returns and covariances. Key functions include download_stock_data, clean_and_save_data, and calculate_returns_and_risk.
-
-Problem formulation – problem_formulation.py converts those statistics into a QUBO matrix where the objective is to maximize returns and penalize risk while enforcing a fixed number of assets. This logic is implemented in construct_qubo.
-
-Classical solution – classical_solver.py provides a brute-force solver that enumerates all binary combinations to minimize the QUBO objective.
-
-Quantum solution – quantum_solver.py defines a QAOA-based approach using Qiskit. It builds a quadratic program from the QUBO matrix and solves it with MinimumEigenOptimizer and QAOA. The README mentions that this quantum solver is paused due to a Python 3.12 environment conflict.
-
-Execution pipeline – main.py ties everything together: it fetches data, computes metrics, constructs the QUBO model, and runs both classical and quantum solvers, printing the results to the console.
-
-The project includes a small dataset (data/stock_data.csv) for demonstration. Running the pipeline requires the packages listed in requirements.txt. On this system, running python src/main.py failed because dependencies (e.g., NumPy) are not installed. Attempting to install them via pip install -r requirements.txt was blocked by the environment’s network restrictions
-
---------
+Streamlit for web app framework
