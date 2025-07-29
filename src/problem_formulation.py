@@ -32,10 +32,10 @@ def construct_qubo(mu, Sigma, K, lambda_val=1.0, gamma=10.0):
     # Objective: -mu_i * x_i  + lambda_val * (Sigma_ij * x_i * x_j)
     for i in range(N):
         # Linear part: -mu_i
-        Q[i, i] += -mu[i]
+        Q[i, i] += -mu.iloc[i]
         for j in range(i, N):
             # Quadratic risk term from covariance matrix
-            Q[i, j] += lambda_val * Sigma[i, j]
+            Q[i, j] += lambda_val * Sigma.iloc[i, j]
             if i != j:
                 Q[j, i] = Q[i, j]
     
