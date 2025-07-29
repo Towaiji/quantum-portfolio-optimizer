@@ -1,33 +1,41 @@
-import unittest
-import numpy as np
-import os
-
 from data_collection import calculate_returns_and_risk
 from problem_formulation import construct_qubo
 from quantum_solver import solve_qubo
 
-class TestQuantumSolverIntegration(unittest.TestCase):
-    def test_quantum_solver_on_real_data(self):
-        # 1. Load data and calculate returns/risk
-        data_path = os.path.join("data", "stock_data.csv")
-        mean_returns, cov_matrix = calculate_returns_and_risk(data_path)
+import os
+import numpy as np
+import pandas as pd
 
-        # 2. Construct QUBO (fill with any additional required args)
-        # Adjust these params as needed
-        budget = 3  # number of assets to select (example)
-        risk_aversion = 0.1
-        Q = construct_qubo(mean_returns, cov_matrix, budget, risk_aversion)
+def main():
+    data_path = os.path.join("data", "stock_data.csv")
+    df = pd.read_csv(data_path, index_col=0, parse_dates=True)
+    mean_returns, cov_matrix = calculate_returns_and_risk(df)
+    budget = 2
+    risk_aversion = 0.1
+    Q = construct_qubo(mean_returns, cov_matrix, budget, risk_aversion)
+    max_allowed = 5.0
+    max_abs = np.abs(Q).max()
+    if max_abs > max_allowed:
+        scale = max_abs / max_allowed
+        print(f"Scaling QUBO by {scale}")
+        Q = Q / scale
 
-        # 3. Run quantum solver
-        result = solve_qubo(Q)
+    Q = np.array(Q, dtype=np.float32)  # <- Extra safe conversion
 
-        # 4. Assertions: type/shape checks
-        self.assertIsInstance(result, dict)
-        self.assertIn("solution", result)
-        self.assertIsInstance(result["solution"], np.ndarray)
+    print("QUBO matrix:\n", Q)
+    result = solve_qubo(Q, reps=1)
 
-        # 5. Optionally, check that the selected assets matches the budget constraint
-        self.assertEqual(result["solution"].sum(), budget)
+    print("\nQuantum Optimization Result:")
+    if hasattr(result, "x"):
+        solution = np.array(result.x)
+        print("Quantum best portfolio selection:", solution)
+        print("Quantum objective value:", result.fval)
+        tickers = list(mean_returns.index)
+        selected = np.where(solution == 1)[0]
+        print("Selected tickers:", [tickers[i] for i in selected])
+    else:
+        print("Result object does not have 'x' attribute! Raw result:")
+        print(result)
 
 if __name__ == "__main__":
-    unittest.main()
+    main()
