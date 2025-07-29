@@ -27,8 +27,9 @@ def solve_qubo_classically(Q):
     return best_x, best_obj
 
 if __name__ == "__main__":
-    # For testing purposes, import the QUBO construction function from problem_formulation.py
+     # For testing purposes, import the QUBO construction function from problem_formulation.py
     from problem_formulation import construct_qubo
+    import pandas as pd
 
     # Example dummy data (replace these with your real mu and Sigma later)
     mu_example = np.array([0.15, 0.12, 0.18, 0.14, 0.10])  # Annual mean returns for 5 stocks
@@ -40,6 +41,10 @@ if __name__ == "__main__":
         [0.03, 0.02, 0.04, 0.01, 0.07]
     ])
     K_example = 2  # For instance, select 2 stocks out of 5
+
+    # <<< CONVERT TO PANDAS!
+    mu_example = pd.Series(mu_example)
+    Sigma_example = pd.DataFrame(Sigma_example)
 
     # Construct the QUBO matrix using the function from problem_formulation.py
     Q = construct_qubo(mu_example, Sigma_example, K_example, lambda_val=1.0, gamma=10.0)

@@ -56,18 +56,20 @@ def construct_qubo(mu, Sigma, K, lambda_val=1.0, gamma=10.0):
 
 # Example usage for testing the function
 if __name__ == "__main__":
+    import pandas as pd
+
     # Dummy example data
-    mu_example = np.array([0.15, 0.12, 0.18, 0.14, 0.10])  # Annual mean returns for 5 stocks
-    Sigma_example = np.array([
+    mu_example = pd.Series([0.15, 0.12, 0.18, 0.14, 0.10])
+
+    Sigma_example = pd.DataFrame([
         [0.10, 0.02, 0.04, 0.01, 0.03],
         [0.02, 0.08, 0.01, 0.03, 0.02],
         [0.04, 0.01, 0.12, 0.02, 0.04],
         [0.01, 0.03, 0.02, 0.09, 0.01],
         [0.03, 0.02, 0.04, 0.01, 0.07]
     ])
-    
-    K_example = 2  # We want to select 2 stocks out of 5.
+    K_example = 2
     Q = construct_qubo(mu_example, Sigma_example, K_example, lambda_val=1.0, gamma=10.0)
-    
+
     print("Constructed QUBO matrix:")
     print(Q)
