@@ -4,86 +4,135 @@ from datetime import datetime
 from data_collection import download_stock_data, clean_and_save_data, calculate_returns_and_risk
 from problem_formulation import construct_qubo
 from classical_solver import solve_qubo_classically
+# from quantum_solver import solve_qubo as solve_qubo_quantum  # Uncomment if quantum works
 
-st.title("Portfolio Optimizer (Classical Version)")
+st.set_page_config(page_title="Portfolio Optimizer", layout="wide")
 
-# --------------- EXPLANATIONS ---------------
-st.markdown("""
-**Instructions:**
-- Enter the list of stock tickers you want to analyze (example: `AAPL, MSFT, GOOGL, AMZN, JPM`)
-- Choose the start and end dates for your backtest period.
-- Select how many stocks you want the optimizer to pick (`K`).
-- Adjust the parameters `lambda` and `gamma` to change risk and constraint weightings (see tooltips).
-""")
+st.title("🧠 Portfolio Optimizer")
+st.markdown(
+    "Easily find your **optimal stock portfolio** using modern optimization techniques."
+)
 
-# ---- Input fields with tooltips and examples ----
+# ----- SIDEBAR with advanced params -----
+st.sidebar.header("Advanced Parameters")
+lambda_val = st.sidebar.number_input(
+    "λ (risk aversion)", min_value=0.0, max_value=100.0, value=1.0, step=0.1,
+    help="How much you care about minimizing risk. Higher λ = safer."
+)
+gamma = st.sidebar.number_input(
+    "γ (constraint penalty)", min_value=0.0, max_value=1000.0, value=10.0, step=1.0,
+    help="Enforces that exactly K stocks are picked. Usually leave at 10."
+)
+
+# ----- MAIN INPUTS -----
+with st.expander("How to Use (Click to Expand)", expanded=True):
+    st.markdown("""
+    **Instructions:**  
+    1. Enter comma-separated stock tickers (e.g., `AAPL,MSFT,GOOGL`).  
+    2. Choose your desired analysis period.  
+    3. Set how many stocks to pick for your portfolio (`K`).  
+    4. Click **Run Optimizer**!
+
+    - λ (lambda): risk aversion.  
+    - γ (gamma): how strictly to pick exactly K stocks.
+
+    _Example: Tickers = `AAPL,MSFT,GOOGL,AMZN,JPM`, K = 2, λ = 1.0, γ = 10.0_
+    """)
 
 tickers = st.text_input(
-    "Enter stock tickers (comma-separated)",
-    "AAPL,MSFT,GOOGL,AMZN,JPM",
-    help="Example: AAPL, MSFT, GOOGL, AMZN, JPM (U.S. stock tickers, comma-separated, no spaces needed)."
+    "Stock Tickers (comma-separated):", 
+    "AAPL,MSFT,GOOGL,AMZN,JPM", 
+    help="E.g., AAPL, MSFT, GOOGL, AMZN, JPM"
 )
 
-start_date = st.date_input(
-    "Start date",
-    datetime(2020, 1, 1),
-    help="The first day of your analysis window. Example: 2020-01-01"
-)
+col1, col2, col3 = st.columns(3)
+with col1:
+    start_date = st.date_input(
+        "Start Date", datetime(2020, 1, 1),
+        help="Start of your backtest window"
+    )
+with col2:
+    end_date = st.date_input(
+        "End Date", datetime.now(),
+        help="End of your backtest window"
+    )
+with col3:
+    K = st.number_input(
+        "Stocks to pick (K)", min_value=1, max_value=20, value=2,
+        help="Number of stocks to select for your portfolio"
+    )
 
-end_date = st.date_input(
-    "End date",
-    datetime.now(),
-    help="The last day of your analysis window. Example: 2025-07-29"
-)
+# --- Solver choice ---
+# solver_type = st.radio("Solver Type", ["Classical", "Quantum (beta, may not work)"])
+solver_type = "Classical"  # Uncomment above if quantum available
 
-K = st.number_input(
-    "Stocks to pick (K)",
-    min_value=1, max_value=10, value=2,
-    help="How many stocks should be included in the optimal portfolio? Example: 2"
-)
+st.divider()
+run_button = st.button("🚀 Run Optimizer")
 
-lambda_val = st.number_input(
-    "lambda (risk aversion)",
-    min_value=0.0, max_value=100.0, value=1.0, step=0.1,
-    help="Controls how much risk matters. Higher lambda = safer (less risky, more stable). Example: 1.0"
-)
+if run_button:
+    try:
+        tickers_list = [t.strip().upper() for t in tickers.split(',') if t.strip()]
+        st.info(f"Fetching data for: {', '.join(tickers_list)}")
+        stock_data = download_stock_data(tickers_list, str(start_date), str(end_date))
+        clean_data = clean_and_save_data(stock_data, 'stock_data.csv')
+        mu, Sigma = calculate_returns_and_risk(clean_data)
+        st.success("Data downloaded & cleaned successfully!")
 
-gamma = st.number_input(
-    "gamma (constraint penalty)",
-    min_value=0.0, max_value=1000.0, value=10.0, step=1.0,
-    help="How hard the optimizer enforces picking exactly K stocks. Higher gamma = more strict. Example: 10.0"
-)
+        # Show a preview
+        with st.expander("Show price data table"):
+            st.dataframe(clean_data.tail(10))
 
-# -------- RUN OPTIMIZER --------
+        # Construct QUBO
+        Q = construct_qubo(mu, Sigma, K, lambda_val=lambda_val, gamma=gamma)
 
-if st.button("Run Optimizer"):
-    tickers_list = [t.strip().upper() for t in tickers.split(',')]
-    stock_data = download_stock_data(tickers_list, str(start_date), str(end_date))
-    clean_data = clean_and_save_data(stock_data, 'stock_data.csv')
-    mu, Sigma = calculate_returns_and_risk(clean_data)
-    Q = construct_qubo(mu, Sigma, K, lambda_val=lambda_val, gamma=gamma)
-    sol, val = solve_qubo_classically(Q)
-    selected = [tickers_list[i] for i in range(len(sol)) if sol[i] == 1]
-    st.markdown("### 🟢 **Selected Stocks:**")
-    st.write(selected)
-    st.markdown("#### 🧬 Best bitstring (solution):")
-    st.write(sol)
-    st.markdown(f"#### 💡 Objective value: `{val}`")
+        # Solve
+        if solver_type == "Classical":
+            sol, val = solve_qubo_classically(Q)
+        # elif solver_type == "Quantum (beta, may not work)":
+        #     quantum_result = solve_qubo_quantum(Q, reps=1)
+        #     sol = quantum_result.x
+        #     val = quantum_result.fval
 
-# ---- OPTIONAL: ADD MORE HELPFUL EXPLANATIONS BELOW ----
-st.markdown("""
----
-**Parameter Explanations:**
-- **tickers:** These are the stock symbols, like `AAPL` for Apple, `MSFT` for Microsoft.
-- **K (Stocks to pick):** How many stocks you want to select for your final portfolio. For example, if you set this to 2, the optimizer will try to pick the best 2 stocks.
-- **lambda (risk aversion):** Controls how much you care about minimizing risk. Set higher to avoid volatile stocks. Set lower if you want to risk more for higher potential return.
-- **gamma (constraint penalty):** Makes the optimizer enforce your “pick K stocks” rule. You can usually leave this at 10.0 unless you know what you’re doing.
+        selected = [tickers_list[i] for i in range(len(sol)) if sol[i] == 1]
+        not_selected = [tickers_list[i] for i in range(len(sol)) if sol[i] == 0]
+        st.subheader("📊 Optimization Results")
+        st.markdown("**🟢 Recommended to INVEST (Buy/Keep):**")
+        st.write(selected)
+        st.markdown("**🔴 Not Selected (Consider Hold/Sell):**")
+        st.write(not_selected)
+        st.markdown(f"**Bitstring (solution):** `{sol}`")
+        st.markdown(f"**Objective value:** `{val}`")
 
-**Example run:**  
-- Tickers: `AAPL, MSFT, GOOGL, AMZN, JPM`  
-- Start date: `2020-01-01`  
-- End date: `2025-07-29`  
-- K: `2`  
-- lambda: `1.0`  
-- gamma: `10.0`
-""")
+        # --- Show mean returns and risk for all stocks ---
+        st.markdown("### 📈 Stock Mean Returns & Risk")
+        stats_df = pd.DataFrame({
+            "Expected Return": mu,
+            "Risk (Variance)": Sigma.values.diagonal()
+        })
+        st.dataframe(stats_df)
+        st.bar_chart(stats_df["Expected Return"])
+
+        # --- Show scatterplot Risk vs Return ---
+        st.markdown("#### Risk vs Return (selected in green):")
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        ax.scatter(stats_df["Risk (Variance)"], stats_df["Expected Return"], c=['g' if s in selected else 'r' for s in tickers_list])
+        for i, t in enumerate(tickers_list):
+            ax.annotate(t, (stats_df["Risk (Variance)"][i], stats_df["Expected Return"][i]))
+        ax.set_xlabel("Risk (Annualized Variance)")
+        ax.set_ylabel("Expected Return")
+        st.pyplot(fig)
+
+        st.success("Done! Adjust parameters and re-run for different results.")
+    except Exception as e:
+        st.error(f"❌ An error occurred: {e}")
+
+# ---- Footer: Add parameter summary
+with st.expander("What do the parameters mean?"):
+    st.markdown("""
+- **K (Stocks to pick):** Number of stocks the optimizer will choose for your portfolio.
+- **lambda (λ):** How much to avoid risk (higher = less risk).
+- **gamma (γ):** How strictly to enforce the “pick K” rule.
+
+_This app fetches real data, runs portfolio optimization, and gives you a simple, transparent recommendation._  
+    """)
