@@ -115,11 +115,15 @@ if run_button:
         not_selected = [tickers_list[i] for i in range(len(sol)) if sol[i] == 0]
         st.subheader("📊 Optimization Results")
         st.markdown("#### 🏆 **Final Portfolio Decision:**")
-        for t, sel in zip(tickers_list, sol):
+        for idx, (t, sel) in enumerate(zip(tickers_list, sol)):
             if sel == 1:
                 st.success(f"✅ {t}: **INVEST (Buy/Hold)**")
             else:
-                st.info(f"❌ {t}: Not in optimal portfolio (Hold/Sell)")
+                exp_return = float(mu[idx]) if hasattr(mu, '__getitem__') else 0
+                if exp_return > 0:
+                    st.warning(f"🟡 {t}: **HOLD** (not in optimal portfolio, but expected return > 0)")
+                else:
+                    st.error(f"❌ {t}: **SELL** (expected return ≤ 0)")
 
         with st.expander("Show optimization solution bitstring (for nerds)"):
             st.markdown(f"**Bitstring:** `{sol}`")
